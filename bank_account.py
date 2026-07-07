@@ -4,7 +4,10 @@ class BankAccount:
         self.name = name
         self.number = number
     def withdraw(self, amountToWithdraw):
-        self.balance -= amountToWithdraw
+        if (amountToWithdraw > self.balance):
+            print("You cannot withdraw more than you have.")
+        else:
+            self.balance -= amountToWithdraw
     def deposit(self, amountToDeposit):
         self.balance += amountToDeposit
     def printBalance(self):
