@@ -37,33 +37,33 @@ def calculate_auv2_acceleration(T, alpha, theta, mass):
     xNeg = (T[2] + T[3]) * np.cos(alpha)
     yPos = (T[0] + T[1]) * np.sin(alpha)
     yNeg = (T[2] + T[3]) * np.sin(alpha)
-    print(f"{xPos}, {xNeg}, {yPos}, {yNeg}")
+    #print(f"{xPos}, {xNeg}, {yPos}, {yNeg}") #commented print statements are for testing purposes
 
     xRel = xPos - xNeg
     yRel = yPos - yNeg
-    print(f"{xRel}, {yRel}")
+    #print(f"{xRel}, {yRel}")
 
     xFin = xRel * np.cos(theta) - yRel * np.sin(theta)
     yFin = xRel * np.sin(theta) + yRel * np.cos(theta)
-    print(f"{xFin}, {yFin}")
-    print(f"{mass}")
+    #print(f"{xFin}, {yFin}")
+    #print(f"{mass}")
 
     ax = xFin / mass
     ay = yFin / mass
-    print(f"{ax}, {ay}")
+    #print(f"{ax}, {ay}")
 
     return [ax, ay]
 
 def calculate_auv2_angular_acceleration(T, alpha, L, l, inertia):
     r = np.sqrt((L**2)+(l**2))
-    torquePos = (T[0] + T[2]) * r * np.sin(alpha)
-    torqueNeg = (T[1] + T[3]) * r * np.sin(alpha)
+    theta = ((np.pi / 2) - alpha) + np.arctan(L/l)
+    #print(f"{r}, {theta}")
+    torquePos = (T[0] + T[2]) * r * np.sin(theta)
+    torqueNeg = (T[1] + T[3]) * r * np.sin(theta)
     torqueNet = torquePos - torqueNeg
-    print(f"{torqueNet}, {torquePos}, {torqueNeg}")
+    #print(f"{torqueNet}, {torquePos}, {torqueNeg}") #For testing purposes
 
     return torqueNet / inertia
 
 testTorque = [12.27, 3.27, 3.8, 5.15]
-
 print(calculate_auv2_angular_acceleration(testTorque, 1.09, 0.516, 0.3, 12.27))
-
