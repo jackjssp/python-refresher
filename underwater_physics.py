@@ -65,5 +65,30 @@ def calculate_auv2_angular_acceleration(T, alpha, L, l, inertia):
 
     return torqueNet / inertia
 
-testTorque = [12.27, 3.27, 3.8, 5.15]
-print(calculate_auv2_angular_acceleration(testTorque, 1.09, 0.516, 0.3, 12.27))
+def simulate_auv2_motion(T, alpha, L, l, mass, inertia, dt, t_final, x0, y0, theta0):
+    accelerationLinear = calculate_auv2_acceleration(T, alpha, theta0, mass)
+    accelerationAngular = calculate_auv2_angular_acceleration(T, alpha, L, l, inertia)
+
+    t = np.array([0])
+    x = np.array([x0])
+    y = np.array([y0])
+    theta = np.array([theta0])
+    v = np.array([0])
+    omega = np.array([0])
+    a = np.array([accelerationLinear])
+
+    tLoop = 0
+    counter = 0
+    while (tLoop < t_final):
+        tLoop += dt
+        t.append(tLoop)
+        v.append(np.linalg.norm(accelerationLinear) * tLoop)
+        omega.append(accelerationAngular * tLoop)
+        a.append(accelerationLinear)
+
+        x.append(x0 + (0.5 * accelerationLinear[0] * (tLoop ** 2)))
+        y.append(y0 + (0.5 * accelerationLinear[1] * (tLoop ** 2)))
+        theta.append(theta0 + (0.5 * accelerationAngular * (tLoop ** 2)))
+        counter += 1
+
+    return t, x, y, theta, v, omega, a
