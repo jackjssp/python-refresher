@@ -1,5 +1,6 @@
 import numpy as np
 
+
 def sumDiff(a, b):
     sum = a + b
     diff = a - b
