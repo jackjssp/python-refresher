@@ -1,4 +1,6 @@
 import numpy as np
+import turtle as turt
+import time
 g = 9.81 #m/s
 
 def calculate_buoyancy(Vsub, density_fluid):
@@ -35,8 +37,8 @@ def calculate_auv_angular_acceleration(F_magnitude, F_angle, I, thruster_distanc
 def calculate_auv2_acceleration(T, alpha, theta, mass):
     xPos = (T[0] + T[1]) * np.cos(alpha)
     xNeg = (T[2] + T[3]) * np.cos(alpha)
-    yPos = (T[0] + T[1]) * np.sin(alpha)
-    yNeg = (T[2] + T[3]) * np.sin(alpha)
+    yPos = (T[0] + T[3]) * np.sin(alpha)
+    yNeg = (T[1] + T[2]) * np.sin(alpha)
     #print(f"{xPos}, {xNeg}, {yPos}, {yNeg}") #commented print statements are for testing purposes
 
     xRel = xPos - xNeg
@@ -65,30 +67,51 @@ def calculate_auv2_angular_acceleration(T, alpha, L, l, inertia):
 
     return torqueNet / inertia
 
+
 def simulate_auv2_motion(T, alpha, L, l, mass, inertia, dt, t_final, x0, y0, theta0):
     accelerationLinear = calculate_auv2_acceleration(T, alpha, theta0, mass)
     accelerationAngular = calculate_auv2_angular_acceleration(T, alpha, L, l, inertia)
 
-    t = np.array([0])
-    x = np.array([x0])
-    y = np.array([y0])
-    theta = np.array([theta0])
-    v = np.array([0])
-    omega = np.array([0])
-    a = np.array([accelerationLinear])
+    t = [0]
+    x = [x0]
+    y = [y0]
+    theta = [theta0]
+    v = [[0, 0]]
+    omega = [0]
+    a = [accelerationLinear]
 
     tLoop = 0
     counter = 0
     while (tLoop < t_final):
         tLoop += dt
         t.append(tLoop)
-        v.append(np.linalg.norm(accelerationLinear) * tLoop)
         omega.append(accelerationAngular * tLoop)
-        a.append(accelerationLinear)
+        theta.append(0.5 * accelerationAngular * (tLoop ** 2))
 
-        x.append(x0 + (0.5 * accelerationLinear[0] * (tLoop ** 2)))
-        y.append(y0 + (0.5 * accelerationLinear[1] * (tLoop ** 2)))
-        theta.append(theta0 + (0.5 * accelerationAngular * (tLoop ** 2)))
+        x.append(x[counter] + (v[counter][0] * dt) + (0.5 * a[counter][0] * (dt ** 2)))
+        y.append(y[counter] + (v[counter][1] * dt) + (0.5 * a[counter][1] * (dt ** 2)))
+
+        v.append([v[counter][0] + (a[counter][0] * dt), v[counter][1] + (a[counter][1] * dt)])
+        a.append(calculate_auv2_acceleration(T, alpha, theta[counter + 1], mass))
+
         counter += 1
 
-    return t, x, y, theta, v, omega, a
+    output = [t, x, y, v, theta, omega, a]
+    return output
+
+def test_auv2_motion(t, x, y, v, theta, omega, a):
+    counter = 0
+    screen = turt.Screen()
+    turt.pendown()
+    for dt in t:
+        turt.setheading(theta[0])
+        turt.goto(x[counter], y[counter])
+        turt.update()
+        time.sleep(dt)
+        counter += 1
+
+
+testTorque = [12.3, 32.5, 20, 8.4]
+i = simulate_auv2_motion(testTorque, np.pi/4, 0.5, 0.3, 15, 22, 0.1, 10, 0, 0, np.pi/2)
+test_auv2_motion(i[0], i[1], i[2], i[3], i[4], i[5], i[6])
+#calculate_auv2_angular_acceleration(testTorque, np.pi/4, 0.5, 0.3, 12.27)
