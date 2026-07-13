@@ -101,17 +101,26 @@ def simulate_auv2_motion(T, alpha, L, l, mass, inertia, dt, t_final, x0, y0, the
 
 def test_auv2_motion(t, x, y, v, theta, omega, a):
     counter = 0
+    turt.radians()
     screen = turt.Screen()
     turt.pendown()
     for dt in t:
-        turt.setheading(theta[0])
+        turt.setheading(theta[counter])
         turt.goto(x[counter], y[counter])
         turt.update()
-        time.sleep(dt)
+        time.sleep(dt*0.0001)
         counter += 1
 
 
-testTorque = [12.3, 32.5, 20, 8.4]
-i = simulate_auv2_motion(testTorque, np.pi/4, 0.5, 0.3, 15, 22, 0.1, 10, 0, 0, np.pi/2)
+testTorque = [0, 0, 0, 10]
+i = simulate_auv2_motion(testTorque, 0, 0.5, 0.3, 15, 22, 0.1, 50, 0, 0, 0)
+#print(f"\ntime: {i[0]}")
+#print(f"\nx: {i[1]}")
+#print(f"\ny: {i[2]}")
+#print(f"\nv: {i[3]}")
+#print(f"\ntheta: {i[4]}")
+#print(f"\nomega: {i[5]}")
+#print(f"\na: {i[6]}")
+
 test_auv2_motion(i[0], i[1], i[2], i[3], i[4], i[5], i[6])
 #calculate_auv2_angular_acceleration(testTorque, np.pi/4, 0.5, 0.3, 12.27)
